@@ -1,0 +1,63 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id String @id @default(uuid())
+
+  name String
+
+// descriçaõ
+  description String?
+
+//preço
+  price Decimal  @db.Decimal(10, 2)
+
+//estoque
+  stock Int
+
+// está disponível
+  in_stock Boolean
+
+// categoria usando enum
+  role Categoria @default(ND)
+
+// tags com array
+  tag String[]
+
+// data de criação 
+  createdAt DateTime @default(now())
+
+// data de atualização 
+  updatedAt DateTime @updatedAt
+
+// mapear nome da tabela
+  @@map("products")
+
+}
+
+
+
+model User {
+  id String @id @default(uuid())
+  email String @unique
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime?  @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+
+enum Categoria {
+  ROUPA
+  COMIDA
+  LIVRO
+  ND
+}
