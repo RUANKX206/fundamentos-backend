@@ -8,40 +8,29 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Category {
+  FASHION
+  FOOD
+  BOOKS
+  ND
+}
+
 model Product {
-  id String @id @default(uuid())
+  id           String @id @default(uuid())
+  name         String
+  description  String?
+  price        Float
+  inStock      Int                    @map("in_stock")
+  isAvailable  Boolean @default(true) @map("is_available")
+  category Category 
+  tags String[]
 
-  name String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime                 @map("update_at")
 
-// descriçaõ
-  description String?
-
-//preço
-  price Decimal  @db.Decimal(10, 2)
-
-//estoque
-  stock Int
-
-// está disponível
-  in_stock Boolean
-
-// categoria usando enum
-  role Categoria @default(ND)
-
-// tags com array
-  tag String[]
-
-// data de criação 
-  createdAt DateTime @default(now())
-
-// data de atualização 
-  updatedAt DateTime @updatedAt
-
-// mapear nome da tabela
   @@map("products")
 
 }
-
 
 
 model User {
@@ -52,12 +41,4 @@ model User {
   updatedAt DateTime?  @updatedAt @map("updated_at")
 
   @@map("users")
-}
-
-
-enum Categoria {
-  ROUPA
-  COMIDA
-  LIVRO
-  ND
 }
