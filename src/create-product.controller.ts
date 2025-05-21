@@ -31,7 +31,7 @@ import { Category } from '@prisma/client';
     price: z.number(),
     inStock: z.number().int().nonnegative(),
     isAvailable: z.boolean(),
-    category: z.string(),
+    category: z.enum([Category.FASHION, Category.FOOD, Category.BOOKS, Category.ND]),
     tags: z.array(z.string())
 
   });
