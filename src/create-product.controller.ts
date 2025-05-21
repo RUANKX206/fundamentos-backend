@@ -3,6 +3,8 @@ import { z } from 'zod';
 import { ZodValidationPipe } from './pipes/zod-validation-pipe';
 import path from 'path';
 import { Reflector } from '@nestjs/core';
+import { CreateProductService } from './create-product.service';
+import { Category } from '@prisma/client';
 
   function isValidCPF(cpf: string): boolean {
     cpf = cpf.replace(/[^\d]+/g, '');
@@ -22,37 +24,20 @@ import { Reflector } from '@nestjs/core';
     return rev === +cpf.charAt(10);
   };
 
+
   const createProductBodySchema = z.object({
     name: z.string(),
-    model: z.string(),
-    dateManuFacture: z.string().date(),
-    year: z.number(),
-    brand: z.string(),
-    email: z.string(),
-    cpf: z.string()
-        .regex(/^\d{11}$/,{
-          message:'CPF deve conter exatamente 11 dígitos numéricos',
-        })
-        .refine(isValidCPF, {
-          message: "CPF invalid",
-        }),
+    description: z.string().optional(),
+    price: z.number(),
+    inStock: z.number().int().nonnegative(),
+    isAvailable: z.boolean(),
+    category: z.string(),
+    tags: z.array(z.string())
 
   });
 
   const updateProductBodySchema = z.object({
-    name: z.string().optional(),
-    model: z.string().optional(),
-    dateManuFacture: z.string().date().optional(),
-    year: z.number().optional(),
-    brand: z.string().optional(),
-    email: z.string().optional(),
-    cpf: z.string()
-        .regex(/^\d{11}$/,{
-          message:'CPF deve conter exatamente 11 dígitos numéricos',
-        })
-        .refine(isValidCPF, {
-          message: "CPF invalid",
-        }),
+    
 
   });
 
@@ -63,51 +48,35 @@ import { Reflector } from '@nestjs/core';
 
   const bodyValidationPipe = new ZodValidationPipe(createProductBodySchema);
   type CreateProductBodySchema = z.infer<typeof createProductBodySchema>;
-  type Product = CreateProductBodySchema & {
-    id: string;
-    status: string;
-  };
 
   //sae
   @Controller('/products')
   export class AppController {
-    private readonly products: Product[] = [];
-    constructor() {}
+    constructor(private createProduct: CreateProductService){}
 
     @Post()
     @HttpCode(201)
-    create(@Body(bodyValidationPipe) body: CreateProductBodySchema) {
-      const { brand, dateManuFacture, cpf, email, model, name, year } = body;
-  
-      return 'created';
-    }
+    async handle(@Body(bodyValidationPipe) body: CreateProductBodySchema) {
+      const {
+        name,  
+        description, 
+        price, 
+        inStock,
+        isAvailable, 
+        category, 
+        tags,
+      } = body;
 
-    @Get()
-    findAll() {
-    }
-    
-    @Get(':id')
-    findById(@Param('id') id: string) {
+      await this.createProduct.execute({
+        name,  
+        description, 
+        price, 
+        inStock,
+        isAvailable, 
+        category: Category[category], 
+        tags
+      });
 
-    }
-
-    @Put(':id')
-    update(@Body(updateBodyValidationPipe) body: UpdateProductBodySchema): string {
-      const { brand, dateManuFacture, cpf, email, model, name, year } = body;
-
-      return 'Produto atualizado'
-
-    }
-    @Patch(":id/status")
-    updateStatus(): string{
-
-      return 'Campo atualizado'
-
-    }
-
-    @Delete(':id')
-    remove(@Param('id') id: string) {
-      return 'Produto removido';
     }
 
   }
