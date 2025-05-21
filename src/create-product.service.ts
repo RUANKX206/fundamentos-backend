@@ -1,42 +1,54 @@
 import { Injectable } from "@nestjs/common";
+import { ProductRepository } from "./products.repository";
 
 
 interface Product {
-    name: string,
-    model: string,
-    dateManufacture: string,
-    year: string,
-    brand: string,
-    email: string,
-    cpf: string
+    id : string;
+    name : string; 
+    description : string;
+    price : number;
+    inStock : number;
+    isAvailable : Boolean;
+    category : string; 
+    tags : String[];
+    createdAt: Date;
+    updateAt: Date;
 }
 
 interface CreateProductServiceRequest {
-    name: string,
-    model: string,
-    dateManufacture: string,
-    year: string,
-    brand: string,
-    email: string,
-    cpf: string
+    id : string;
+    name : string; 
+    description : string;
+    price : number;
+    inStock : number;
+    isAvailable : Boolean;
+    category : string; 
+    tags : String[]
+    createdAt: Date;
+    updateAt: Date;
+    
 }
 
+
 type CreateProductServiceResponse = {
-    product: Product;
+    product: CreateProductService;
 }
 
 @Injectable()
 export class CreateProductService {
-    constructor() {}
+    constructor(private productRepository: ProductRepository) {}
 
     async execute({
-        brand,
-        cpf,
-        dateManufacture,
-        email,
-        model,
-        name,
-        year
+        id,
+        name,  
+        description, 
+        price, 
+        inStock,
+        isAvailable, 
+        category, 
+        tags,
+        createdAt,
+        updateAt,
     }: CreateProductServiceRequest): Promise<CreateProductServiceResponse>{
         return new Promise(()=>{});
     }

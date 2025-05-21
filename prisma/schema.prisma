@@ -17,7 +17,7 @@ enum Category {
 
 model Product {
   id           String @id @default(uuid())
-  name         String
+  name         String @unique
   description  String?
   price        Float
   inStock      Int                    @map("in_stock")
@@ -26,7 +26,7 @@ model Product {
   tags String[]
 
   createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime                 @map("update_at")
+  updatedAt DateTime? @updatedAt   @map("update_at")
 
   @@map("products")
 
