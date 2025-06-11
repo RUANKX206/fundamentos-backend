@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
-import { PrismaService } from "./prisma.service";
+
 import { Prisma, PrismaClient } from "@prisma/client";
+import { PrismaService } from "./prisma.service";
 
 @Injectable()
 export class ProductRepository {
@@ -26,9 +27,39 @@ export class ProductRepository {
     return product;
     }
 
-    async create(product: Prisma.ProductUncheckedCreateInput) : Promise<void> {
-        await this.prisma.product.create({
-            data: product,
+    async create(product: Prisma.ProductUncheckedCreateInput) : Promise<Prisma.ProductUncheckedCreateInput> {
+        return await this.prisma.product.create({
+            data: product
         });
     }
+
+
+    async findRecents(): Promise<Array<Prisma.ProductUncheckedCreateInput> | null>{
+        const model = this.prisma.product.findMany();
+        return model
+    
+    }
+
+    async updateById(product: Prisma.ProductUncheckedCreateInput): Promise<Prisma.ProductUncheckedCreateInput | null> {
+    const id = product.id;
+    if (!id) return null;
+
+    const productFindById = await this.findById(id);
+    if (!productFindById) return null;
+
+    const updatedProduct = await this.prisma.product.update({
+        where: { id },
+        data: {
+            category: product.category,
+            description: product.description,
+            name: product.name,
+            tags: product.tags,
+            inStock: product.inStock,
+            price: product.price,
+            isAvailable: product.isAvailable
+        }
+    });
+
+    return updatedProduct;
 }
+} 

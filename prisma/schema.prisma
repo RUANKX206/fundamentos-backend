@@ -28,6 +28,10 @@ model Product {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt   @map("update_at")
 
+  orderItems OrderItem[]
+
+  models Model[] @relation("product_models")
+
   @@map("products")
 
 }
@@ -37,8 +41,72 @@ model User {
   id String @id @default(uuid())
   email String @unique
 
+
+  Profile Profile? // One to One 
+  order Order[]
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime?  @updatedAt @map("updated_at")
 
   @@map("users")
+  
 }
+
+
+model Model {
+  id String @id @default(uuid())
+  name String @unique
+  
+  products Product[] @relation("product_models")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime?  @updatedAt @map("updated_at")
+  @@map("models")
+}
+
+model Profile{
+  id String @id @default(uuid())
+  avatarUrl String? @map("avatar_url")
+  userId String @unique
+  user User @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime?  @updatedAt @map("updated_at")
+
+  @@map("profiles")
+
+
+}
+
+model Order{
+  id String @id @default(uuid())
+  total Float
+
+  userId String 
+  user  User @relation(fields: [userId], references: [id])
+  orderItems OrderItem[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime?  @updatedAt @map("updated_at")
+  @@map("orders")
+
+}
+
+model OrderItem{
+  orderId String 
+  productId String
+  quantity Float
+
+  order Order @relation(fields: [orderId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime?  @updatedAt @map("updated_at")
+
+  @@id([orderId, productId])
+  @@map("order_items")
+
+}
+
+
+    
